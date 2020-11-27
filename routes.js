@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 const requestHandler = (req, res) => {
 
     const url = req.url;
@@ -8,24 +6,31 @@ const requestHandler = (req, res) => {
     if (url === '/') {
         res.setHeader('Content-Type', 'text/html');
         res.write(`<html>`);
-        res.write(`<head><title>First page</title></head>`);
-        res.write(`<body><form action="/message" method="POST"><input type="text" name="message"><button type="submit">Send</button></form></body>`);
+        res.write(`<head><title>Hello World!</title></head>`);
+        res.write(`<body><h3>Hello World!</h3><form action="/create-user" method="POST"><input type="text" name="user"><button type="submit">Send</button></form></body>`);
         res.write(`</html>`);
         return res.end();
     }
-    if (url === '/message' && method === 'POST') {
+    if (url === '/users') {
+        res.setHeader('Content-Type', 'text/html');
+        res.write(`<html>`);
+        res.write(`<head><title>Users</title></head>`);
+        res.write(`<body><ul><li>Jay</li><li>Jhon Doe</li></ul></body>`);
+        res.write(`</html>`);
+        return res.end();
+    }
+    if (url === '/create-user' && method === 'POST') {
         const body = [];
         req.on('data', (chunk) => {
             body.push(chunk);
         });
         return req.on('end', () => {
             const parsedBody = Buffer.concat(body).toString();
-            const message = parsedBody.split('=')[1];
-            fs.writeFile('message.txt', message, err => {
-                res.statusCode = 302;
-                res.setHeader('Location', '/');
-                return res.end();
-            });
+            const username = parsedBody.split('=')[1];
+            console.log(`User : ${username}`)
+            res.statusCode = 302;
+            res.setHeader('Location', '/');
+            return res.end();
         });
     }
     res.setHeader('Content-Type', 'text/html');

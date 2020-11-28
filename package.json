@@ -1,0 +1,26 @@
+{
+  "name": "nodejs-the-complete-guide",
+  "version": "1.0.0",
+  "description": "",
+  "main": "nodemon app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JayTailor45/NodeJS-The-Complete-Guide.git"
+  },
+  "keywords": [
+    "nodejs"
+  ],
+  "author": "JayTailor45",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JayTailor45/NodeJS-The-Complete-Guide/issues"
+  },
+  "homepage": "https://github.com/JayTailor45/NodeJS-The-Complete-Guide#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}

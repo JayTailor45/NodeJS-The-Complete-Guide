@@ -1,0 +1,5 @@
+{
+  "dbConfig": {
+    "connectionString": "<==REPLACE IT WITH WHOLE CONNECTION STRING AND REMOVE DEMO FROM THE FILE NAME==>"
+  }
+}

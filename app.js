@@ -2,10 +2,12 @@ const path = require('path');
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+
+const {dbConfig} = require('./app.config');
 
 const errorController = require('./controllers/error');
 
-const mongoConnect = require('./util/database').mongoConnect;
 const User = require('./models/user');
 
 const app = express();
@@ -20,9 +22,9 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-    User.findById("5fde5f0a33228cbd3715b8c2")
+    User.findById('5fe103a928464b18c4ebf47c')
         .then(user => {
-            req.user = new User(user.name, user.email, user.cart, user._id);
+            req.user = user;
             next();
         })
         .catch(console.error);
@@ -33,8 +35,20 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoConnect(_ => {
-    app.listen(3000);
-});
-
-
+mongoose.connect(dbConfig.connectionString, {useNewUrlParser: true, useUnifiedTopology: true})
+    .then(res => {
+        User.findOne().then(user => {
+            if (!user) {
+                const user = new User({
+                    name: 'Jay',
+                    email: 'tailorj64@gmail.com',
+                    cart: {
+                        items: []
+                    }
+                });
+                user.save();
+            }
+        });
+        app.listen(3000);
+    })
+    .catch(console.error);

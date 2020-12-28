@@ -8,7 +8,6 @@ exports.getProducts = (req, res, next) => {
                 prods: products,
                 pageTitle: 'All Products',
                 path: '/products',
-                isAuthenticated: req.user
             });
         })
         .catch(console.error);
@@ -22,7 +21,6 @@ exports.getCart = (req, res, next) => {
                 path: '/cart',
                 pageTitle: 'Your Cart',
                 products: user.cart.items,
-                isAuthenticated: req.user
             });
         })
         .catch(console.error);
@@ -34,8 +32,7 @@ exports.getIndex = (req, res, next) => {
             res.render('shop/index', {
                 prods: products,
                 pageTitle: 'Shop',
-                path: '/',
-                isAuthenticated: req.user
+                path: '/'
             });
         })
         .catch(console.error);
@@ -68,7 +65,6 @@ exports.getOrders = (req, res, next) => {
                 path: '/orders',
                 pageTitle: 'Your Orders',
                 orders: orders,
-                isAuthenticated: req.user
             });
         })
         .catch(console.error);
@@ -78,7 +74,6 @@ exports.getCheckout = (req, res, next) => {
     res.render('shop/checkout', {
         path: '/checkout',
         pageTitle: 'Checkout',
-        isAuthenticated: req.user
     });
 };
 
@@ -94,7 +89,7 @@ exports.postOrder = (req, res, next) => {
             });
             const order = new Order({
                 user: {
-                    name: req.user.name,
+                    email: req.user.email,
                     userId: req.user
                 },
                 products: products
@@ -116,7 +111,7 @@ exports.getProduct = (req, res, next) => {
         .then((product) => {
             console.log(product);
             res.render('shop/product-detail', {
-                product: product, pageTitle: product.title, path: '/products', isAuthenticated: req.user
+                product: product, pageTitle: product.title, path: '/products'
             });
         })
         .catch(console.error);

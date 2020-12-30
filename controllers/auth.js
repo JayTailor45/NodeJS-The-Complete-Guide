@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const {validationResult} = require('express-validator/check');
 
 const User = require('../models/user');
 
@@ -6,11 +7,20 @@ exports.getLogin = (req, res, next) => {
     res.render('auth/login', {
         path: '/login',
         pageTitle: 'Login',
+        errorMessage: '',
     });
 };
 
 exports.postLogin = (req, res, next) => {
     const {email, password} = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).render('auth/login', {
+            path: '/login',
+            pageTitle: 'Login',
+            errorMessage: errors.array()[0].msg
+        });
+    }
     User.findOne({email})
         .then(user => {
             if (!user) {
@@ -25,12 +35,19 @@ exports.postLogin = (req, res, next) => {
                             res.redirect('/');
                         });
                     }
-                    res.redirect('/login');
+                    return res.render('auth/login', {
+                        path: '/login',
+                        pageTitle: 'Login',
+                        errorMessage: ''
+                    });
                 })
                 .catch(err => {
-                    console.error(err);
-                    res.redirect('/login');
-                });
+                    return res.render('auth/login', {
+                        path: '/login',
+                        pageTitle: 'Login',
+                        errorMessage: 'Something Went wrong!'
+                    });
+                })
         }).catch(console.error);
 };
 
@@ -49,18 +66,25 @@ exports.getSignup = (req, res, next) => {
 
 exports.postSignup = (req, res, next) => {
     const {email, password} = req.body;
-    User.findOne({email})
-        .then(user => {
-            if (!user) {
-                return bcrypt.hash(password, 12);
-            }
-        })
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).render('auth/login', {
+            path: '/login',
+            pageTitle: 'Login',
+            errorMessage: errors.array()[0].msg
+        });
+    }
+    return bcrypt.hash(password, 12)
         .then(hashedPassword => {
             const newUser = new User({email, password: hashedPassword, cart: {items: []}});
             return newUser.save();
         })
         .then(result => {
-            res.redirect('/login');
+            return res.render('auth/login', {
+                path: '/login',
+                pageTitle: 'Login',
+                errorMessage: ''
+            });
         })
         .catch(console.error);
 };

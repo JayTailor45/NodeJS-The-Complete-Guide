@@ -48,7 +48,12 @@ exports.postLogin = (req, res, next) => {
                         errorMessage: 'Something Went wrong!'
                     });
                 })
-        }).catch(console.error);
+        })
+        .catch(err => {
+            const error = new Error('Something went wrong!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };
 
 exports.postLogout = (req, res, next) => {
@@ -86,5 +91,9 @@ exports.postSignup = (req, res, next) => {
                 errorMessage: ''
             });
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Something went wrong while creating a new user!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };

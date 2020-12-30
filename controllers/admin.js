@@ -30,7 +30,11 @@ exports.postAddProduct = (req, res, next) => {
             console.log(`Product created!`);
             res.redirect('/admin/products');
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Product creation failed!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -90,7 +94,11 @@ exports.postEditProduct = (req, res, next) => {
             console.log(`Product updated!`);
             res.redirect('/admin/products');
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Unable to update the data!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
@@ -100,7 +108,11 @@ exports.postDeleteProduct = (req, res, next) => {
             console.log(`Product deleted!`);
             res.redirect('/admin/products');
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Something went wrong while deleting a product!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };
 
 exports.getProducts = (req, res, next) => {
@@ -112,5 +124,9 @@ exports.getProducts = (req, res, next) => {
                 path: '/admin/products',
             });
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Unable to fetch products!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };

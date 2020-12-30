@@ -10,7 +10,11 @@ exports.getProducts = (req, res, next) => {
                 path: '/products',
             });
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Unable to fetch data!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };
 
 exports.getCart = (req, res, next) => {
@@ -23,7 +27,11 @@ exports.getCart = (req, res, next) => {
                 products: user.cart.items,
             });
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Unable to fetch cart data!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };
 
 exports.getIndex = (req, res, next) => {
@@ -35,7 +43,11 @@ exports.getIndex = (req, res, next) => {
                 path: '/'
             });
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Unable to fetch data!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };
 
 exports.postCart = (req, res, next) => {
@@ -55,7 +67,11 @@ exports.postCartDeleteProduct = (req, res, next) => {
         .then(_ => {
             res.redirect('/cart');
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Something went wrong while deleting the product from the cart!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };
 
 exports.getOrders = (req, res, next) => {
@@ -67,7 +83,11 @@ exports.getOrders = (req, res, next) => {
                 orders: orders,
             });
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Unable to fetch order data!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };
 
 exports.getCheckout = (req, res, next) => {
@@ -102,7 +122,11 @@ exports.postOrder = (req, res, next) => {
         .then(_ => {
             res.redirect('/orders');
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Something went wrong while saving order!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };
 
 exports.getProduct = (req, res, next) => {
@@ -114,5 +138,9 @@ exports.getProduct = (req, res, next) => {
                 product: product, pageTitle: product.title, path: '/products'
             });
         })
-        .catch(console.error);
+        .catch(err => {
+            const error = new Error('Unable to fetch products!');
+            error.httpStatusCode = 500;
+            next(error);
+        });
 };

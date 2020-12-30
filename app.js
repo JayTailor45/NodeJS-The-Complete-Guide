@@ -33,6 +33,12 @@ app.use(session({secret: 'secret', resave: false, saveUninitialized: false, stor
 app.use(csrfProtection);
 
 app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.user;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
+
+app.use((req, res, next) => {
     if (!req.session.user) {
         return next();
     }
@@ -40,23 +46,32 @@ app.use((req, res, next) => {
         .then(user => {
             req.user = user;
             next();
-        }).catch(console.error);
-});
-
-app.use((req, res, next) => {
-    res.locals.isAuthenticated = req.session.user;
-    res.locals.csrfToken = req.csrfToken();
-    next();
+        })
+        .catch(err => {
+            next(new Error(err));
+        });
 });
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
+app.get('/500', errorController.get500);
 app.use(errorController.get404);
+
+app.use((error, req, res, next) => {
+    // res.redirect('/500');
+    res.status(500).render('500', {
+        pageTitle: 'Something went wrong!', path: '/500'
+    });
+});
 
 mongoose.connect(dbConfig.connectionString, {useNewUrlParser: true, useUnifiedTopology: true})
     .then(res => {
         app.listen(3000);
     })
-    .catch(console.error);
+    .catch(err => {
+        const error = new Error('Something went wrong with the DB connection!');
+        error.httpStatusCode = 500;
+        next(error);
+    });

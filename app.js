@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const csurf = require('csurf');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 const {dbConfig} = require('./app.config');
@@ -27,8 +29,25 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './images/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, uuidv4() + path.extname(file.originalname));
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    const allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+    const shouldAllow = allowedMimeTypes.includes(file.mimetype);
+    cb(null, shouldAllow);
+};
+
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(session({secret: 'secret', resave: false, saveUninitialized: false, store: store}));
 app.use(csrfProtection);
 

@@ -1,3 +1,8 @@
+const fs = require('fs');
+const path = require('path');
+
+const PDFDocument = require('pdfkit');
+
 const Product = require('../models/product');
 const Order = require('../models/orders');
 
@@ -143,4 +148,47 @@ exports.getProduct = (req, res, next) => {
             error.httpStatusCode = 500;
             next(error);
         });
+};
+
+
+exports.getInvoice = (req, res, next) => {
+    const orderId = req.params.orderId;
+    Order.findById(orderId)
+        .then(order => {
+            if (!order) {
+                return next(new Error('Order not found!'));
+            }
+            if (order.user.userId.toString() !== req.user._id.toString()) {
+                return next(new Error('Unauthorized!'));
+            }
+            const invoiceName = `invoice-${orderId}.pdf`;
+            const invoicePath = path.join('data', 'invoices', invoiceName);
+
+            const pdfDoc = new PDFDocument();
+            pdfDoc.pipe(fs.createWriteStream(invoicePath));
+            pdfDoc.pipe(res);
+            pdfDoc.fontSize(16).text('Invoice', {underline: true});
+            pdfDoc.fontSize(14).text('-'.repeat(16));
+            let total = 0;
+            order.products.forEach(prod => {
+                total += prod.quantity * prod.quantity;
+                pdfDoc.text(`${prod.product.title} - ${prod.quantity} x $${prod.product.price}`);
+            });
+            pdfDoc.fontSize(14).text('-'.repeat(16));
+            pdfDoc.fontSize(20).text(`Total Price: $${total}`);
+            pdfDoc.end();
+            /*fs.readFile(invoicePath, (err, data) => {
+                if (err) {
+                    return next(err);
+                }
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `attachment; filename="${invoiceName}"`);
+                res.send(data);
+            });*/
+            // const file = fs.createReadStream(invoicePath);
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename="${invoiceName}"`);
+            // file.pipe(res);
+        })
+        .catch(err => next(err));
 };

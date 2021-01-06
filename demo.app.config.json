@@ -1,5 +1,8 @@
 {
   "dbConfig": {
     "connectionString": "<==REPLACE IT WITH WHOLE CONNECTION STRING AND REMOVE DEMO FROM THE FILE NAME==>"
+  },
+  "stripeConfig": {
+    "secretKey": "<==REPLACE IT WITH YOUR STRIPE SECRET KEY==>"
   }
 }
